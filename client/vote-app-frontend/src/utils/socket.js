@@ -3,7 +3,7 @@ let connectedPromise = null;
 
 export const initSocket = () => {
   if (!socket || socket.readyState === WebSocket.CLOSED) {
-    socket = new WebSocket("wss://voting-app-wqpx.onrender.com");
+    socket = new WebSocket("ws://localhost:4000");
 
     connectedPromise = new Promise((resolve, reject) => {
       socket.onopen = () => {
