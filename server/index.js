@@ -17,14 +17,14 @@ app.get("/", (req, res) => {
 });
 
 wss.on("connection", (socket) => {
-  // const origin = req.headers.origin;
-  // const allowedOrigins = ["https://voting-app-black.vercel.app"];
+  const origin = req.headers.origin;
+  const allowedOrigins = ["https://voting-app-black.vercel.app"];
 
-  // if (!allowedOrigins.includes(origin)) {
-  //   console.log("Blocked connection from:", origin);
-  //   socket.close();
-  //   return;
-  // }
+  if (!allowedOrigins.includes(origin)) {
+    console.log("Blocked connection from:", origin);
+    socket.close();
+    return;
+  }
   console.log("New connection!!");
 
   socket.on("message", (message) => {
