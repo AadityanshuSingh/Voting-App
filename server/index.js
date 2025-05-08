@@ -55,7 +55,7 @@ wss.on("connection", (socket) => {
     console.log("Client Disconnected");
   });
 });
-const PORT = process.env.PORT || 4000;
-httpServer.listen(PORT, () => {
+
+httpServer.listen(4000, () => {
   console.log(`App is running successfully at 4000`);
 });
