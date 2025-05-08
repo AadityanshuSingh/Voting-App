@@ -18,7 +18,7 @@ app.get("/", (req, res) => {
 
 wss.on("connection", (socket) => {
   const origin = req.headers.origin;
-  const allowedOrigins = ["https://your-frontend-domain.com"];
+  const allowedOrigins = ["https://voting-app-black.vercel.app"];
 
   if (!allowedOrigins.includes(origin)) {
     console.log("Blocked connection from:", origin);
