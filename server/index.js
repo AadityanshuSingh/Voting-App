@@ -25,12 +25,13 @@ wss.on("connection", (socket) => {
       const res = login(data.payload);
       socket.send(JSON.stringify(res));
     } else if (data.type == "CREATE_ROOM") {
-      createRoom(data.payload);
+      createRoom(data);
     } else if (data.type == "JOIN_ROOM") {
-      const res = joinRoom(data.payload);
+      const res = joinRoom(data);
       socket.send(JSON.stringify(res));
     } else if (data.type == "CAST_VOTE") {
-      const res = cast_vote(data.payload);
+      console.log("data reveived for voting in server", data);
+      const res = cast_vote(data);
       wss.clients.forEach((client) => {
         if (client.readyState == WebSocket.OPEN) {
           client.send(JSON.stringify(res));
