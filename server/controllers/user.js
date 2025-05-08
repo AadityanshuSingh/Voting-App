@@ -22,7 +22,7 @@ exports.cast_vote = (req) => {
   let voted_rooms = Users.get(username);
   console.log("Data received for voting", req);
   if (!voted_rooms.includes(room_id)) {
-    let room_data = vote(req).data;
+    let room_data = vote(req);
     voted_rooms.push(room_id);
     Users.set(username, voted_rooms);
     console.log("room data after vote", room_data);

@@ -43,11 +43,12 @@ const Dashboard = () => {
         setRooms(data.data);
       } else if (data.type == "CAST_VOTE") {
         console.log("data received after updating vote", data);
-        setRooms((prevRooms) =>
-          prevRooms.map((room) => (room.id === data.id ? data : room))
+        setCurrentRoom((prev) =>
+          prev && prev.id === data.id ? data.data : prev
         );
-
-        setCurrentRoom((prev) => (prev && prev.id === data.id ? data : prev));
+        setRooms((prevRooms) =>
+          prevRooms.map((room) => (room.id === data.id ? data.data : room))
+        );
       }
     };
   }, [socket]);
