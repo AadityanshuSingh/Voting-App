@@ -29,7 +29,7 @@ A minimal real-time voting app built with **React**, **Chakra UI**, **Node.js**,
 ---
 
 ```bash
-git clone https://github.com/yourusername/realtime-voting-app.git
+git clone https://github.com/AadityanshuSingh/realtime-voting-app.git
 cd client/realtime-voting-app
 ```
 
