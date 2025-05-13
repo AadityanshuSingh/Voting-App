@@ -5,6 +5,9 @@ exports.createRoom = (req) => {
     question: req.question,
     optA: req.optA,
     optB: req.optB,
+    isTimeOut: req.isTimeOut,
+    duration: req.duration,
+    endTime: req.endTime,
     countA: 0,
     countB: 0,
   };

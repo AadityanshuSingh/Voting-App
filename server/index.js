@@ -32,14 +32,23 @@ wss.on("connection", (socket) => {
     } else if (data.type == "CAST_VOTE") {
       console.log("data reveived for voting in server", data);
       const res = cast_vote(data);
+      if (!res.success) {
+        socket.send(JSON.stringify(res));
+      } else {
+        wss.clients.forEach((client) => {
+          if (client.readyState == WebSocket.OPEN) {
+            client.send(JSON.stringify(res));
+          }
+        });
+      }
+    } else if (data.type == "GET_ROOM") {
+      const res = getRooms();
+      // socket.send(JSON.stringify(res));
       wss.clients.forEach((client) => {
         if (client.readyState == WebSocket.OPEN) {
           client.send(JSON.stringify(res));
         }
       });
-    } else if (data.type == "GET_ROOM") {
-      const res = getRooms();
-      socket.send(JSON.stringify(res));
     }
   });
 

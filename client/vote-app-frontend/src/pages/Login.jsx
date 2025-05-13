@@ -55,7 +55,7 @@ const Login = () => {
       <Box
         width={"100%"}
         height={"100vh"}
-        bg={"papayawhip"}
+        bgGradient={"linear(to-b, #90cbed, #c8e8f5, #e4eef7)"}
         borderRadius={"0"}
         overflow={"auto"}
         pt={"20px"}
@@ -68,20 +68,30 @@ const Login = () => {
         alignContent={"center"}
       >
         <Card
-          bg={"blue.100"}
+          bg={"HEX:#ffffff"}
+          bgGradient={"linear(to-b, #c9f0f8, #d7f4fb, #f8fcff, #fcfefd)"}
           mx={"auto"}
           mt={"auto"}
           mb={"auto"}
-          w={"60%"}
+          w={["250px", "300px", "450px", "500px"]}
           variant={"filled"}
           shadow={"2xl"}
         >
-          <CardHeader>
-            <Text fontWeight={"bold"} fontSize={"5xl"} color={"ButtonFace"}>
+          <CardHeader p={0} ml={"auto"} mr={"auto"} mb={0}>
+            <Text
+              fontWeight={"bold"}
+              fontSize={"5xl"}
+              color={"#575a5f"}
+              mb={"0px"}
+            >
               Welcome!!
             </Text>
           </CardHeader>
           <CardBody>
+            <Text align={"center"} color={"gray.500"} mb={"8px"}>
+              Jump in, vote live, and see results unfold instantly — your
+              opinion matters!
+            </Text>
             <Input
               placeholder="Enter Your Username"
               type="text"
@@ -90,9 +100,14 @@ const Login = () => {
           </CardBody>
           <CardFooter p={4}>
             <Button
-              bg={"blue.300"}
-              _hover={{ cursor: "pointer", bg: "blue.500" }}
+              bg={"#24242e"}
+              color={"gray.300"}
+              _hover={{ cursor: "pointer", bg: "gray.600" }}
               onClick={handleClick}
+              ml={"auto"}
+              mr={"auto"}
+              w={"75%"}
+              h={8}
             >
               Login
             </Button>

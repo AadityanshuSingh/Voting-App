@@ -5,6 +5,7 @@ import {
   CardBody,
   CardFooter,
   CardHeader,
+  Divider,
   HStack,
   Input,
   Menu,
@@ -12,10 +13,13 @@ import {
   MenuItem,
   MenuList,
   Text,
+  useToast,
+  VStack,
 } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import { getSocket, sendMessage } from "../utils/socket";
 import { data } from "react-router-dom";
+import Chart from "../components/Chart";
 
 const Dashboard = () => {
   const [socket, setSocket] = useState(null);
@@ -24,6 +28,19 @@ const Dashboard = () => {
   const [currRoom, setCurrentRoom] = useState(null);
   const [OptA, setOptA] = useState("");
   const [OptB, setOptB] = useState("");
+  const [isTimeOut, setIsTimeOut] = useState(false);
+  const [duration, setDuration] = useState(0);
+  const toast = useToast();
+
+  const callToast = (title, status) => {
+    toast({
+      title: title,
+      status: status,
+      duration: 2000,
+      isClosable: true,
+      position: "top",
+    });
+  };
 
   useEffect(() => {
     const res = getSocket();
@@ -43,6 +60,11 @@ const Dashboard = () => {
         setRooms(data.data);
       } else if (data.type == "CAST_VOTE") {
         console.log("data received after updating vote", data);
+        if (!data.success) {
+          callToast(data.message, "error");
+          return;
+        }
+        callToast(data.message, "success");
         setCurrentRoom((prev) =>
           prev && prev.id === data.id ? data.data : prev
         );
@@ -111,7 +133,7 @@ const Dashboard = () => {
       <Box
         width={"100%"}
         height={"100vh"}
-        bg={"papayawhip"}
+        bgGradient={"linear(to-b, #90cbed, #c8e8f5, #e4eef7)"}
         borderRadius={"0"}
         overflow={"auto"}
         pt={"20px"}
@@ -121,21 +143,105 @@ const Dashboard = () => {
             width: "10px",
           },
         }}
-        alignContent={"center"}
       >
-        <HStack>
-          <Card ml={"auto"} w={"45%"}>
-            <CardHeader>All Rooms</CardHeader>
-            <CardBody>
+        <HStack h={"inherit"}>
+          <Card
+            bgGradient={"linear(to-br, #5f85ff, #686eff, #715cff, #744fff)"}
+            ml={"auto"}
+            w={"45%"}
+            h={"90%"}
+            boxShadow={"dark-lg"}
+            borderRadius={"20px"}
+          >
+            <CardBody w={"100%"}>
               <Menu>
                 <MenuButton as={Button}>Rooms Menu</MenuButton>
                 <MenuList>{renderRooms}</MenuList>
               </Menu>
+              {currRoom ? (
+                <>
+                  <Text
+                    color={"#e5edff"}
+                    align={"center"}
+                    fontWeight={"bold"}
+                    fontSize={"2xl"}
+                    mt={5}
+                  >
+                    Question : {currRoom.question}
+                  </Text>
+
+                  {localStorage.getItem("userRooms") ? (
+                    localStorage.getItem("userRooms").includes(currRoom.id) ? (
+                      <Text>You have already Voted</Text>
+                    ) : (
+                      <VStack w={"100%"} mt={5}>
+                        <Button
+                          onClick={voteA}
+                          w={"100%"}
+                          bg={"#5e52d9"}
+                          color={"#b1bdff"}
+                          _hover={{ bg: "#5e32d9", color: "gray.200" }}
+                        >
+                          A. {currRoom.optA}
+                        </Button>
+                        <Button
+                          onClick={voteB}
+                          w={"100%"}
+                          color={"#b1bdff"}
+                          _hover={{ bg: "#5e32d9", color: "gray.200" }}
+                          bg={"#5e52d9"}
+                        >
+                          B. {currRoom.optB}
+                        </Button>
+                      </VStack>
+                    )
+                  ) : (
+                    <></>
+                  )}
+                  <Divider orientation="horizontal" mt={3} />
+                  <Text
+                    color={"#e5edff"}
+                    align={"center"}
+                    fontWeight={"bold"}
+                    fontSize={"xl"}
+                    mt={0}
+                    pt={0}
+                  >
+                    Poll Statistics
+                  </Text>
+                  <Chart
+                    optA={currRoom.optA}
+                    optB={currRoom.optB}
+                    countA={currRoom.countA}
+                    countB={currRoom.countB}
+                  />
+                </>
+              ) : (
+                <></>
+              )}
             </CardBody>
+            <CardFooter p={0} mt={0}>
+              <HStack justify={"space-between"} w={"100%"} pl={2} pr={2} mb={2}>
+                <Text color={"#e5edff"} fontSize={"sm"}>
+                  Current Room ID :{" "}
+                  {currRoom ? currRoom.id : "No Room Selected"}
+                </Text>
+                <Text color={"#e5edff"} fontSize={"sm"}>
+                  Total Votes :{" "}
+                  {currRoom ? currRoom.countA + currRoom.countB : 0}
+                </Text>
+              </HStack>
+            </CardFooter>
           </Card>
-          <Card mr={"auto"} w={"45%"}>
+          <Card
+            mr={"auto"}
+            w={"45%"}
+            h={"90%"}
+            boxShadow={"dark-lg"}
+            borderRadius={"20px"}
+          >
             <CardHeader>Create Your Room</CardHeader>
-            <CardBody>
+            <CardBody ml={"auto"} mr={"auto"}>
               <Input
                 placeholder="Post your question"
                 mb={"4px"}
@@ -157,49 +263,20 @@ const Dashboard = () => {
                   setOptB(e.target.value);
                 }}
               />
+              <Box display={"flex"} justifyContent={"center"} mt={2}>
+                <Button
+                  bg={"blue.300"}
+                  onClick={handleCreateRoom}
+                  ml={"auto"}
+                  mr={"auto"}
+                  h={8}
+                >
+                  Create
+                </Button>
+              </Box>
             </CardBody>
-            <CardFooter>
-              <Button bg={"blue.300"} onClick={handleCreateRoom}>
-                Create
-              </Button>
-            </CardFooter>
           </Card>
         </HStack>
-        <Card w={"60%"} mt={5} ml={"auto"} mr={"auto"}>
-          <CardHeader>
-            Current Room : {currRoom ? currRoom.id : "No Room Selected"}
-          </CardHeader>
-          <CardBody>
-            {currRoom ? (
-              <>
-                <Text>Question : {currRoom.question}</Text>
-                <HStack>
-                  <Text>Option A : {currRoom.optA}</Text>
-                  <Text>Votes for A : {currRoom.countA}</Text>
-                </HStack>
-                <HStack>
-                  <Text>Option B : {currRoom.optB}</Text>
-                  <Text>Votes for B : {currRoom.countB}</Text>
-                </HStack>
-
-                {localStorage.getItem("userRooms") ? (
-                  localStorage.getItem("userRooms").includes(currRoom.id) ? (
-                    <Text>You have already Voted</Text>
-                  ) : (
-                    <HStack>
-                      <Button onClick={voteA}>Vote A</Button>
-                      <Button onClick={voteB}>Vote B</Button>
-                    </HStack>
-                  )
-                ) : (
-                  <></>
-                )}
-              </>
-            ) : (
-              <></>
-            )}
-          </CardBody>
-        </Card>
       </Box>
     </>
   );
