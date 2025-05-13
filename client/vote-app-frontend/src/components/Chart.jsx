@@ -26,7 +26,7 @@ const VoteBarChart = ({ optA, optB, countA, countB }) => {
             <Box
               w="100%"
               h="40px"
-              bg="#5e52d8"
+              bg={"#5e52d8"}
               borderRadius="md"
               overflow="hidden"
               position="relative"

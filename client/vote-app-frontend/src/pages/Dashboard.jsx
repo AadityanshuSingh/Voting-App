@@ -22,7 +22,7 @@ import {
   useToast,
   VStack,
 } from "@chakra-ui/react";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { getSocket, sendMessage } from "../utils/socket";
 import { data } from "react-router-dom";
 import Chart from "../components/Chart";
@@ -37,6 +37,7 @@ const Dashboard = () => {
   const [OptB, setOptB] = useState("");
   const [isTimeOut, setIsTimeOut] = useState(false);
   const [duration, setDuration] = useState(1);
+  const debounceRef = useRef(null);
   const toast = useToast();
 
   const callToast = (title, status) => {
@@ -148,6 +149,26 @@ const Dashboard = () => {
     setIsTimeOut((prev) => !prev);
   };
 
+  const findRoomById = (e) => {
+    const roomId = e.target.value;
+
+    if (debounceRef.current) {
+      clearTimeout(debounceRef.current);
+    }
+    if (roomId == "") {
+      setCurrentRoom(null);
+      return;
+    }
+    debounceRef.current = setTimeout(() => {
+      const newRoom = rooms.find((room) => room.id == roomId);
+      if (newRoom) {
+        setCurrentRoom(newRoom);
+      } else {
+        callToast("No such room found", "info");
+      }
+    }, 1000);
+  };
+
   const renderRooms = rooms.map((room) => {
     return (
       <MenuItem
@@ -156,6 +177,9 @@ const Dashboard = () => {
           setCurrentRoom(room);
           console.log(room);
         }}
+        color={"gray.400"}
+        bg={"inherit"}
+        _hover={{ bg: "gray.500" }}
       >
         Room ID : {room.id}
       </MenuItem>
@@ -194,11 +218,7 @@ const Dashboard = () => {
               },
             }}
           >
-            <CardBody w={"100%"}>
-              <Menu>
-                <MenuButton as={Button}>Rooms Menu</MenuButton>
-                <MenuList>{renderRooms}</MenuList>
-              </Menu>
+            <CardBody w={"100%"} mt={2} pt={0}>
               {currRoom ? (
                 <>
                   <Text
@@ -300,7 +320,18 @@ const Dashboard = () => {
             borderRadius={"20px"}
             bgGradient={"linear(to-br, #0f0f0f, #1a1a40, #23235b)"}
           >
-            <CardHeader color={"gray.200"}>Create Your Room</CardHeader>
+            <CardHeader
+              color={"gray.200"}
+              fontSize={"2xl"}
+              fontWeight={"bold"}
+              textAlign={"center"}
+              mb={0}
+              mt={5}
+              pt={2}
+              pb={0}
+            >
+              Create Your Room
+            </CardHeader>
             <CardBody ml={"auto"} mr={"auto"}>
               <Input
                 placeholder="Post your question"
@@ -361,7 +392,9 @@ const Dashboard = () => {
               </Stack>
               <Box display={"flex"} justifyContent={"center"} mt={2}>
                 <Button
-                  bg={"blue.300"}
+                  bg={"#5e52d8"}
+                  color={"#b1bdff"}
+                  _hover={{ bg: "#5e32d9", color: "gray.200" }}
                   onClick={handleCreateRoom}
                   ml={"auto"}
                   mr={"auto"}
@@ -370,6 +403,51 @@ const Dashboard = () => {
                   Create
                 </Button>
               </Box>
+              <Divider orientation="horizontal" mt={3} />
+              <Stack w={"100%"} mt={3} mb={3}>
+                <Text color={"#e5edff"} align={"left"}>
+                  Select a Room to Join
+                </Text>
+                <Menu>
+                  <MenuButton
+                    bg={"#5e52d8"}
+                    _hover={{ bg: "#5e32d9", color: "gray.200" }}
+                    _active={{ bg: "#5e32d9", color: "gray.200" }}
+                    color={"#b1bdff"}
+                    as={Button}
+                  >
+                    All Rooms Menu
+                  </MenuButton>
+                  <MenuList
+                    maxH={"200px"}
+                    overflowY={"auto"}
+                    css={{
+                      "&::-webkit-scrollbar": {
+                        width: "0px",
+                      },
+                    }}
+                    bg={"gray.600"}
+                    borderRadius={"20px"}
+                    color={"#b1bdff"}
+                    border={0}
+                    p={1}
+                  >
+                    {renderRooms}
+                  </MenuList>
+                </Menu>
+                <Text color={"#e5edff"} align={"center"} fontSize={"sm"}>
+                  OR
+                </Text>
+                <Text color={"#e5edff"} align={"left"}>
+                  Enter a Room ID
+                </Text>
+                <Input
+                  placeholder="Room ID"
+                  mb={"4px"}
+                  color={"gray.200"}
+                  onChange={findRoomById}
+                />
+              </Stack>
             </CardBody>
           </Card>
         </HStack>

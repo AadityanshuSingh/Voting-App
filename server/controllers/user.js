@@ -12,7 +12,7 @@ exports.login = (req) => {
     success: true,
     type: "LOGIN",
     message: "User Logged in Successfully!!",
-    data: Users[req],
+    data: Users.get(req),
   };
 };
 

@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 
 const Timer = ({ endTime, duration }) => {
   const [timeLeft, setTimeLeft] = useState(
-    new Date(endTime).getTime() - Date.now()
+    Math.max(new Date(endTime).getTime() - Date.now(), 0)
   );
 
   const [percent, setPercent] = useState(
