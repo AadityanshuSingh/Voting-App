@@ -1,20 +1,9 @@
-const express = require("express");
-const app = express();
-
-const { createServer } = require("http");
-const httpServer = createServer(app);
+const PORT = process.env.PORT || 4000;
 
 const WebSocket = require("ws");
 const { login, cast_vote } = require("./controllers/user");
 const { createRoom, joinRoom, getRooms } = require("./controllers/room");
-const wss = new WebSocket.Server({ server: httpServer });
-
-app.get("/", (req, res) => {
-  return res.json({
-    success: true,
-    message: "Your server is up and running...",
-  });
-});
+const wss = new WebSocket.Server({ port: PORT });
 
 wss.on("connection", (socket) => {
   console.log("New connection!!");
@@ -57,6 +46,4 @@ wss.on("connection", (socket) => {
   });
 });
 
-httpServer.listen(4000, () => {
-  console.log(`App is running successfully at 4000`);
-});
+console.log("Server is running on port", PORT);

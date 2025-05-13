@@ -3,7 +3,7 @@ let connectedPromise = null;
 
 export const initSocket = () => {
   if (!socket || socket.readyState === WebSocket.CLOSED) {
-    socket = new WebSocket("ws://localhost:4000");
+    socket = new WebSocket(import.meta.env.VITE_SERVER_URL);
 
     connectedPromise = new Promise((resolve, reject) => {
       socket.onopen = () => {
