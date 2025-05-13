@@ -13,15 +13,15 @@ import React, { useEffect, useState } from "react";
 import { getSocket, sendMessage } from "../utils/socket";
 import { useNavigate } from "react-router-dom";
 
-const Login = () => {
+const Login = ({ socket }) => {
   const [user, setUser] = useState(null);
-  const [socket, setSocket] = useState(null);
+  // const [socket, setSocket] = useState(null);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const res = getSocket();
-    setSocket(res);
-  }, []);
+  // useEffect(() => {
+  //   const res = getSocket();
+  //   setSocket(res);
+  // }, []);
 
   useEffect(() => {
     if (!socket) return;
