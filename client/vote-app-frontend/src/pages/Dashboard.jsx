@@ -5,6 +5,7 @@ import {
   CardBody,
   CardFooter,
   CardHeader,
+  Checkbox,
   Divider,
   HStack,
   Input,
@@ -12,6 +13,11 @@ import {
   MenuButton,
   MenuItem,
   MenuList,
+  Slider,
+  SliderFilledTrack,
+  SliderThumb,
+  SliderTrack,
+  Stack,
   Text,
   useToast,
   VStack,
@@ -20,6 +26,7 @@ import React, { useEffect, useState } from "react";
 import { getSocket, sendMessage } from "../utils/socket";
 import { data } from "react-router-dom";
 import Chart from "../components/Chart";
+import Timer from "../components/Timer";
 
 const Dashboard = () => {
   const [socket, setSocket] = useState(null);
@@ -29,7 +36,7 @@ const Dashboard = () => {
   const [OptA, setOptA] = useState("");
   const [OptB, setOptB] = useState("");
   const [isTimeOut, setIsTimeOut] = useState(false);
-  const [duration, setDuration] = useState(0);
+  const [duration, setDuration] = useState(1);
   const toast = useToast();
 
   const callToast = (title, status) => {
@@ -76,14 +83,20 @@ const Dashboard = () => {
   }, [socket]);
 
   const handleCreateRoom = async () => {
-    if (!question?.trim || !OptA?.trim || !OptB?.trim) return;
-
+    if (question?.trim() == "" || OptA?.trim() == "" || OptB?.trim() == "") {
+      callToast("Please fill all the fields", "error");
+      return;
+    }
+    // console.log(question, OptA, OptB, isTimeOut, duration);
     const payload = {
       type: "CREATE_ROOM",
       id: rooms.length + 1,
       question: question,
       optA: OptA,
       optB: OptB,
+      isTimeOut: isTimeOut,
+      duration: duration,
+      endTime: new Date(Date.now() + duration * 1000 * 60),
     };
 
     await sendMessage(payload);
@@ -93,7 +106,20 @@ const Dashboard = () => {
     await sendMessage(updRoom);
   };
 
+  const isTimedOut = () => {
+    const currTime = new Date();
+    const endTime = new Date(currRoom.endTime);
+    if (currTime >= endTime) {
+      return true;
+    }
+    return false;
+  };
+
   const voteA = async () => {
+    if (currRoom.isTimeOut && isTimedOut()) {
+      callToast("Poll has ended. You cannot vote!!", "warning");
+      return;
+    }
     const payload = {
       type: "CAST_VOTE",
       id: currRoom.id,
@@ -105,6 +131,10 @@ const Dashboard = () => {
   };
 
   const voteB = async () => {
+    if (currRoom.isTimeOut && isTimedOut()) {
+      callToast("Poll has ended. You cannot vote!!", "warning");
+      return;
+    }
     const payload = {
       type: "CAST_VOTE",
       id: currRoom.id,
@@ -112,6 +142,10 @@ const Dashboard = () => {
       vote: "B",
     };
     await sendMessage(payload);
+  };
+
+  const handleCheckbox = () => {
+    setIsTimeOut((prev) => !prev);
   };
 
   const renderRooms = rooms.map((room) => {
@@ -143,15 +177,22 @@ const Dashboard = () => {
             width: "10px",
           },
         }}
+        textColor={"gray.200"}
       >
         <HStack h={"inherit"}>
           <Card
-            bgGradient={"linear(to-br, #5f85ff, #686eff, #715cff, #744fff)"}
+            bgGradient={"linear(to-br, #0f0f0f, #1a1a40, #23235b)"}
             ml={"auto"}
             w={"45%"}
-            h={"90%"}
+            h={"100%"}
             boxShadow={"dark-lg"}
             borderRadius={"20px"}
+            overflow={"auto"}
+            css={{
+              "&::-webkit-scrollbar": {
+                width: "0px",
+              },
+            }}
           >
             <CardBody w={"100%"}>
               <Menu>
@@ -169,35 +210,26 @@ const Dashboard = () => {
                   >
                     Question : {currRoom.question}
                   </Text>
-
-                  {localStorage.getItem("userRooms") ? (
-                    localStorage.getItem("userRooms").includes(currRoom.id) ? (
-                      <Text>You have already Voted</Text>
-                    ) : (
-                      <VStack w={"100%"} mt={5}>
-                        <Button
-                          onClick={voteA}
-                          w={"100%"}
-                          bg={"#5e52d9"}
-                          color={"#b1bdff"}
-                          _hover={{ bg: "#5e32d9", color: "gray.200" }}
-                        >
-                          A. {currRoom.optA}
-                        </Button>
-                        <Button
-                          onClick={voteB}
-                          w={"100%"}
-                          color={"#b1bdff"}
-                          _hover={{ bg: "#5e32d9", color: "gray.200" }}
-                          bg={"#5e52d9"}
-                        >
-                          B. {currRoom.optB}
-                        </Button>
-                      </VStack>
-                    )
-                  ) : (
-                    <></>
-                  )}
+                  <VStack w={"100%"} mt={5}>
+                    <Button
+                      onClick={voteA}
+                      w={"100%"}
+                      bg={"#5e52d9"}
+                      color={"#b1bdff"}
+                      _hover={{ bg: "#5e32d9", color: "gray.200" }}
+                    >
+                      A. {currRoom.optA}
+                    </Button>
+                    <Button
+                      onClick={voteB}
+                      w={"100%"}
+                      color={"#b1bdff"}
+                      _hover={{ bg: "#5e32d9", color: "gray.200" }}
+                      bg={"#5e52d9"}
+                    >
+                      B. {currRoom.optB}
+                    </Button>
+                  </VStack>
                   <Divider orientation="horizontal" mt={3} />
                   <Text
                     color={"#e5edff"}
@@ -215,6 +247,26 @@ const Dashboard = () => {
                     countA={currRoom.countA}
                     countB={currRoom.countB}
                   />
+                  {currRoom.isTimeOut ? (
+                    <VStack mt={2}>
+                      <Text
+                        color={"#e5edff"}
+                        align={"center"}
+                        fontWeight={"bold"}
+                        fontSize={"xl"}
+                        mt={0}
+                        pt={0}
+                      >
+                        Poll Ends in :
+                      </Text>
+                      <Timer
+                        endTime={currRoom.endTime}
+                        duration={currRoom.duration}
+                      />
+                    </VStack>
+                  ) : (
+                    <></>
+                  )}
                 </>
               ) : (
                 <></>
@@ -236,11 +288,19 @@ const Dashboard = () => {
           <Card
             mr={"auto"}
             w={"45%"}
-            h={"90%"}
+            h={"100%"}
+            overflow={"auto"}
+            css={{
+              "&::-webkit-scrollbar": {
+                width: "0px",
+              },
+            }}
+            mt={0}
             boxShadow={"dark-lg"}
             borderRadius={"20px"}
+            bgGradient={"linear(to-br, #0f0f0f, #1a1a40, #23235b)"}
           >
-            <CardHeader>Create Your Room</CardHeader>
+            <CardHeader color={"gray.200"}>Create Your Room</CardHeader>
             <CardBody ml={"auto"} mr={"auto"}>
               <Input
                 placeholder="Post your question"
@@ -248,6 +308,7 @@ const Dashboard = () => {
                 onChange={(e) => {
                   setQuestion(e.target.value);
                 }}
+                color={"gray.200"}
               />
               <Input
                 placeholder="Set Option A"
@@ -255,6 +316,7 @@ const Dashboard = () => {
                 onChange={(e) => {
                   setOptA(e.target.value);
                 }}
+                color={"gray.200"}
               />
               <Input
                 placeholder="Set Option B"
@@ -262,7 +324,41 @@ const Dashboard = () => {
                 onChange={(e) => {
                   setOptB(e.target.value);
                 }}
+                color={"gray.200"}
               />
+              <Stack>
+                <Checkbox
+                  colorScheme={"green"}
+                  isChecked={isTimeOut}
+                  onChange={handleCheckbox}
+                  color={"gray.200"}
+                >
+                  Timed Poll
+                </Checkbox>
+                {isTimeOut ? (
+                  <HStack>
+                    <Slider
+                      min={1}
+                      max={10}
+                      step={1}
+                      defaultValue={1}
+                      onChange={(val) => {
+                        setDuration(val);
+                      }}
+                    >
+                      <SliderTrack>
+                        <SliderFilledTrack />
+                      </SliderTrack>
+                      <SliderThumb bg={"purple.200"} />
+                    </Slider>
+                    <Text color={"gray.400"} fontSize={"sm"}>
+                      Duration : {duration} minutes
+                    </Text>
+                  </HStack>
+                ) : (
+                  <></>
+                )}
+              </Stack>
               <Box display={"flex"} justifyContent={"center"} mt={2}>
                 <Button
                   bg={"blue.300"}
