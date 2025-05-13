@@ -11,9 +11,9 @@ wss.on("connection", (socket) => {
   socket.on("message", (message) => {
     const data = JSON.parse(message);
     if (data.type == "LOGIN") {
-      console.log("data sending to client", data);
       const res = login(data.payload);
       socket.send(JSON.stringify(res));
+      console.log("data sending to client", res);
     } else if (data.type == "CREATE_ROOM") {
       createRoom(data);
     } else if (data.type == "JOIN_ROOM") {
