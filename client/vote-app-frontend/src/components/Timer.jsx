@@ -5,9 +5,11 @@ const Timer = ({ endTime, duration }) => {
   const [timeLeft, setTimeLeft] = useState(
     new Date(endTime).getTime() - Date.now()
   );
+
   const [percent, setPercent] = useState(
     Math.floor((timeLeft / duration) * 100)
   );
+  const [progressColor, setProgressColor] = useState("green.400");
   useEffect(() => {
     // console.log(Date(endTime) - Date.now(), percent);
     const interval = setInterval(() => {
@@ -19,7 +21,21 @@ const Timer = ({ endTime, duration }) => {
         return;
       }
       setTimeLeft(newTimeLeft);
-      setPercent(Math.floor((newTimeLeft / (duration * 60 * 1000)) * 100));
+      const newPercent = Math.floor(
+        (newTimeLeft / (duration * 60 * 1000)) * 100
+      );
+      setPercent(newPercent);
+      if (newPercent >= 75) {
+        setProgressColor("green.400");
+      } else if (newPercent >= 50) {
+        setProgressColor("yellow.400");
+      } else if (newPercent >= 25) {
+        setProgressColor("orange.400");
+      } else if (newPercent >= 10) {
+        setProgressColor("red.400");
+      } else {
+        setProgressColor("red.600");
+      }
     }, 1000);
 
     return () => clearInterval(interval);
@@ -28,7 +44,7 @@ const Timer = ({ endTime, duration }) => {
     <>
       <CircularProgress
         value={percent}
-        color="green.400"
+        color={progressColor}
         size="120px"
         thickness="8px"
       >
