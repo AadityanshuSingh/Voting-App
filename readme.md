@@ -2,9 +2,11 @@
 
 A minimal real-time voting app built with **React**, **Chakra UI**, **Node.js**, and **WebSocket**. This app allows users to create voting rooms, vote in real-time, and see live updates of results — all without a database. Everything runs in-memory.
 
-**Note:-** Since the Backend of this project is deployed on Render, you might have to wait for some time to get a response from the server while using the deployed link of the frontend. 
+**Note:-** Since the Backend of this project is deployed on Render, you might have to wait for some time to get a response from the server while using the deployed link of the frontend.
 
 ---
+
+![image](screenshot.png)
 
 ## Features
 
@@ -14,16 +16,19 @@ A minimal real-time voting app built with **React**, **Chakra UI**, **Node.js**,
 - Real-time vote updates for all connected users
 - Client-side restriction: vote only once per room
 - Decide the Time limit for the poll you create and watch it getting updated in Real-Time
+
 ---
 
 ## Tech-Stack
 
 **Frontend:**
+
 - React
 - Chakra UI
 - WebSocket API
 
 **Backend:**
+
 - Node.js
 - ws (WebSocket library)
 
@@ -33,6 +38,7 @@ A minimal real-time voting app built with **React**, **Chakra UI**, **Node.js**,
 
 The Project folder is split up into two subfolders, namely client (Frontend) and server (Backend).
 To run the project locally, install the zip file of this repo on your desktop. Then follow the steps below.
+
 ```bash
 git clone https://github.com/AadityanshuSingh/realtime-voting-app.git
 cd client/realtime-voting-app
@@ -51,6 +57,7 @@ npm start
 ## Brief on Vote-state sharing and Room Management
 
 The State of the Room in the Backend is managed by maintaining an array of objects (rooms). Each object represents a room and has the following properties
+
 1. id: for uniqueness, in this case, the id is the index of the object in the rooms array
 2. question: The question set by the client
 3. optA: A string containing option A
@@ -62,6 +69,7 @@ The State of the Room in the Backend is managed by maintaining an array of objec
 9. countB: Votes in B (default 0)
 
 Besides these, there are certain function which are evoked to fulfill certain requirements
+
 1. createRoom - Creates a new object in the rooms array
 2. getRooms - To send the rooms array for the client
 3. vote - To update vote counts for a particular room based on request data
