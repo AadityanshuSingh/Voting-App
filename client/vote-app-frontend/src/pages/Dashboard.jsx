@@ -72,7 +72,7 @@ const Dashboard = () => {
           callToast(data.message, "error");
           return;
         }
-        callToast(data.message, "success");
+        // callToast(data.message, "success");
         setCurrentRoom((prev) =>
           prev && prev.id === data.id ? data.data : prev
         );
