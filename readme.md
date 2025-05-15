@@ -40,8 +40,7 @@ The Project folder is split up into two subfolders, namely client (Frontend) and
 To run the project locally, install the zip file of this repo on your desktop. Then follow the steps below.
 
 ```bash
-git clone https://github.com/AadityanshuSingh/realtime-voting-app.git
-cd client/realtime-voting-app
+git clone https://github.com/AadityanshuSingh/Voting-App.git
 ```
 
 **Install Dependencies(Frontend)**
